@@ -1,0 +1,280 @@
+/* --------------------------------------------------------------------------
+Copyright 2012 by Richard Albrecht
+richard.albrecht@rleofield.de
+www.rleofield.de
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+------------------------------------------------------------------------------
+*/
+
+
+
+#include <iostream>
+
+#ifdef _WIN32
+#include <conio.h>
+#include <io.h>
+#include <direct.h>
+#include <conio.h>
+#endif
+
+#include <vector>
+#include <algorithm>
+#include <string.h>
+
+#include "ftwalk.h"
+
+using namespace std;
+
+
+namespace ftw {
+
+
+   namespace {
+
+      const int MAX_PATH_LENGTH = 255; //PATH_MAX;
+
+
+      string working_directory() {
+         char Array[ fn::MAX_PATH_LENGTH ];
+#ifdef __linux__
+         //getcwd( Array, MAX_PATH_LENGTH - 1 );
+#endif
+#ifdef _WIN32
+         _getcwd( Array, MAX_PATH_LENGTH - 1 );
+#endif
+         int l = strlen( Array );
+
+         if( l <= 0 ) {
+            return "";
+         }
+
+         if( Array[l - 1] != fn::chslash ) {
+            Array[l] = fn::chslash;
+            Array[l + 1] = 0;
+         }
+
+         return Array;
+      }
+
+      bool  change_directory( string const& in ) {
+         fn::tFilename f;
+         //  cout << "chdir: " << mPath.c() << endl;
+         string pwd = working_directory();
+
+         if( pwd == in ) { // nothing to do
+            return true;
+         }
+
+#ifdef __linux__
+         int fp = 0; //access( pwd.c_str(), R_OK );
+#endif
+#ifdef _WIN32
+         int fp = _access( pwd.c_str(), 0 );
+#endif
+
+         if( fp == 0 ) {   // can access target, change
+
+#ifdef __linux__
+            int err = 0;//chdir( in.c_str() );
+#endif
+#ifdef _WIN32
+            int err = _chdir( in.c_str() );
+#endif
+
+            if( err == 0 ) {
+               return true;
+            }
+         }
+
+         return false;
+      }
+
+      class tSaveCurrentDirectory {
+         string saved;
+      public:
+         tSaveCurrentDirectory(): saved( working_directory() ){}
+         ~tSaveCurrentDirectory() {
+            change_directory( saved );
+         }
+      };
+
+
+
+   }
+
+   class tRead_files_in_subfolder {
+      std::vector<fn::tFilename> & files;
+      string wildcard;
+      string wildcard_extension;
+   public:
+      tRead_files_in_subfolder( std::vector<fn::tFilename> & f , string const& wildcard_, std::string wildcard_ext )
+         :
+         files( f ),
+         wildcard( wildcard_ ),
+         wildcard_extension( wildcard_ext ) {
+         int i = 0;
+      }
+
+      void operator()( string const& folder ) {
+         change_directory( folder );
+
+         //       struct _finddata_t c_file;
+         //       size_t pos = wildcard.find('*');
+         //       string temp = wildcard;
+         //       if( pos == string::npos ){
+         //          temp =  "*" + wildcard;
+         //       }
+         //       char const* wildcardPtr = temp.c_str();
+         //       intptr_t hFile = ::_findfirst( wildcardPtr, &c_file );
+         //       if ( hFile ==  -1 ) {
+         //          return;
+         //       }
+         //       int ret = 0;
+         //       while ( ret == 0 ) {
+         //          if (   c_file.attrib == _A_NORMAL
+         //             || c_file.attrib & _A_RDONLY
+         //             || c_file.attrib & _A_ARCH
+         //             || c_file.attrib & _A_SYSTEM
+         //             || c_file.attrib & _A_HIDDEN ) {
+         //                string temp = c_file.name ;
+
+         //                string basename = fn::getbasename(temp);
+         //                string extension = fn::getextension(temp);
+         //                //
+         //                // MS Bug!!!!
+         //                // Umgehung des MS Wildcardfilters
+         //                // z.B wird bei wildcard ="*.cpp" eine extension mit ".cppcheck" als korrekt angesehen.
+         //                // daher Vergleich mit wildcard_extension aus dem Pattern am Start
+         //                if( wildcard_extension.size() > 0 ){
+         //                   if( extension == wildcard_extension ){
+         //                      fn::tFilename f1;
+         //                      f1.Path( folder );
+         //                      f1.Base( basename );
+         //                      f1.Extension( extension );
+         //                      files.push_back( f1 );
+         //                //cout << f1.fullname() << endl;
+         //                   }
+         //                   else{
+         //                      // für den Debugger zur Kontrolle
+         //                      fn::tFilename f2;
+         //                      f2.Path( folder );
+         //                      f2.Base( basename );
+         //                      f2.Extension( extension );
+         //                //cout << f2.fullname() << endl;
+
+
+         //                   // extension entspricht nicht dem Suchpattern
+         //                   // keinen Eintrag der Liste anlegen.
+         //                   }
+         //                }
+         //                else{
+
+         //                   fn::tFilename f;
+         //                   f.Path( folder );
+         //                   f.Base( basename );
+         //                   f.Extension( extension );
+         //                   files.push_back( f );
+         //                //cout << f.fullname() << endl;
+         //                }
+
+         //          }
+         //          ret = ::_findnext( hFile, &c_file );
+         //       }
+         //       ::_findclose( hFile );
+         return ;
+      }
+
+   };
+
+
+   void tFileTreeWalk::read_subfolders( string const& root ) {
+          bool b = change_directory( root );
+      //    if( !b ) return;
+
+      //    struct ::_finddata_t c_file;
+
+      //    intptr_t hFile = ::_findfirst( "*", &c_file );
+      //    if ( hFile ==  -1 )
+      //       return ;
+
+      //    int ret = 0;
+      //    // _findnext liefert 0, wenn noch etwas gefunden wurde
+      //    while ( ret == 0 )            {
+      //       string f = c_file.name;
+      //       if ( c_file.attrib & _A_SUBDIR && f != ".." && f != "." ) {
+      //          string temp = fn::correct_slash_at_end( root + f );
+      //          _folders += temp ;
+      //          read_subfolders( temp ) ;
+      //       }
+      //       ret = ::_findnext( hFile, &c_file );
+      //    }
+      //    ::_findclose( hFile );
+
+   }
+
+
+   size_t tFileTreeWalk::FileTreeWalk( string const& path, string const& pattern ) {
+
+      // sichere den Arbeitsfolder und setze diesen am Ende der Methode zurueck, ueber Destruktor
+      tSaveCurrentDirectory save;
+
+      _folders.clear();
+      _files.clear();
+
+      _wildcard = pattern;
+      string wildcard_ext = fn::getextension( pattern );
+      size_t pos_questionmark = wildcard_ext.find( '?' ) ;
+      size_t pos_star = wildcard_ext.find( '*' ) ;
+
+      if( pos_questionmark == string::npos && pos_star == string::npos ) {
+         // wildcard hat eine normale extension
+         _wildcard_ext = wildcard_ext;
+      }
+
+      //adjust path
+      string temp = fn::correct_slash_at_end( path );
+
+      // beginne mit der Folderliste, erster Eintrag
+      _folders += temp;
+      // lese rekursiv alle sub folder
+      read_subfolders( temp );
+
+      if( _folders.size() == 1 ) {
+         _folders.clear();
+      }
+
+      // und lese alle filenamem in diesen subfolders
+      if( _folders.size() > 0 ) {
+         for_each( _folders.begin(), _folders.end(), tRead_files_in_subfolder( _files, _wildcard, _wildcard_ext ) );
+      }
+
+      return _files.size();
+
+   }
+   std::vector<fn::tFilename> const& tFileTreeWalk::FilenameList()const {
+      return _files;
+   }
+   std::vector<std::string> const& tFileTreeWalk::FolderList()const {
+      return _folders;
+   }
+
+
+
+} // namespace
+
+
+// EOF
+
+

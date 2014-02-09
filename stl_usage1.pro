@@ -11,7 +11,8 @@ SOURCES += \
     src/hfile/t_ifncontrol.cpp \
     src/hfile/filehelper.cpp \
     src/hstring/stringhelper.cpp \
-    src/hstring/gettokens.cpp
+    src/hstring/gettokens.cpp \
+    src/hfile/time.cpp
 
 HEADERS += \
     src/filefn/t_filename.h \
@@ -69,3 +70,7 @@ INCLUDEPATH += $$PWD/src/ftw
 
 
 LIBS += -lboost_thread -lboost_system -lboost_filesystem
+
+OTHER_FILES += \
+    lgpl-3.0.txt \
+    README.md

@@ -1,3 +1,22 @@
+/* --------------------------------------------------------------------------
+Copyright 2012 by Richard Albrecht
+richard.albrecht@rleofield.de
+www.rleofield.de
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+------------------------------------------------------------------------------
+*/
 
 
 
@@ -10,6 +29,10 @@
 #include <iomanip>
 #include <iostream>
 #include <fstream>
+#include <iostream>
+#include <sstream>
+#include <chrono>
+#include <mutex>
 
 #include <boost/filesystem.hpp>
 
@@ -17,6 +40,16 @@
 #include "stringhelper.h"
 #include "filehelper.h"
 #include "t_filename.h"
+
+
+
+
+static std::mutex mutex;
+
+#define HAS_STD_PUT_TIME 0
+
+using std::string;
+
 
 
 using namespace std;
@@ -163,26 +196,6 @@ namespace rlf_hfile_intern {
 
 
 
-   // YYYY-MM-DD_hh-mm-ss
-   string date_time() {
-      time_t osBinaryTime;  // C run-time time (defined in <time.h>)
-      time( &osBinaryTime ) ;  // Get the current time from the os
-      struct tm* today = localtime( &osBinaryTime );
-      stringstream o;
-      fill( o, 4, today->tm_year + 1900 );
-      o <<  "-";
-      fill( o, 2, today->tm_mon + 1 );
-      o <<  "-";
-      fill( o, 2, today->tm_mday );
-      o <<  "_";
-      fill( o, 2, today->tm_hour );
-      o <<  "-";
-      fill( o, 2, today->tm_min );
-      o <<  "-";
-      fill( o, 2, today->tm_sec );
-      return o.str();
-   }
-
    string working_directory() {
       string pwd = current_path();
       return pwd;
@@ -227,6 +240,11 @@ namespace rlf_hfile_intern {
 
    std::string correct_slash_at_end( std::string const& path ) {
       std::string temp = path;
+
+      if( temp.size() == 0 ) {
+         return string();
+      }
+
       // correct slash at end
       string s = local::slash();
 

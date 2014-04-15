@@ -1,6 +1,6 @@
 
-#ifndef FILETREEWALK_H
-#define FILETREEWALK_H
+#ifndef RLF_FILETREEWALK_H
+#define RLF_FILETREEWALK_H
 
 
 #include "t_filename.h"

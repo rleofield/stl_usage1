@@ -38,21 +38,68 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdexcept>
 #include <boost/filesystem.hpp>
 
-#include "helper.h"
-
-using namespace helper_read_write_file;
 
 namespace rlf_txtrw {
+
+
+
+   namespace rhelper {
+      const std::string marker = "%s";
+      inline std::string FindAndReplace( const std::string& source,
+                                         const std::string& find,
+                                         const std::string& replace ) {
+         size_t i;
+         size_t start = 0;
+         std::string ret = source;
+
+         for( ; ( i = ret.find( find, start ) ) != std::string::npos; ) {
+            ret.replace( i, find.length(), replace );
+            start = i + replace.length();
+         }
+
+         return ret;
+      }
+
+      inline std::string replace( std::string const& msg, std::string const& s0 = "" ) {
+
+         if( s0.size() > 0 ) {
+            return FindAndReplace( msg, rhelper::marker, s0 );
+         }
+
+         return msg;
+
+      }
+
+
+
+
+
+   }
+
    namespace err {
-      const std::string msg_file_not_exists = "File doesn't exist: '" + marker + "'";
-      const std::string msg_read_file = " Couldn't read file '" + marker + "'";
+      const std::string msg_file_not_exists = "File doesn't exist: '" + rhelper::marker + "'";
+      const std::string msg_read_file = " Couldn't read file '" + rhelper::marker + "'";
 
       inline std::string read_file( std::string const& s0 ) {
-         return replace( msg_read_file, s0 );
+         return rhelper::replace( msg_read_file, s0 );
       }
       inline std::string file_not_exists( std::string const& s0 ) {
-         return replace( msg_file_not_exists, s0 );
+         return rhelper::replace( msg_file_not_exists, s0 );
       }
+      inline bool file_exists_r( boost::filesystem::path const& p ) {
+         if( !boost::filesystem::is_regular_file( p ) ) {
+            return false;
+         }
+
+         boost::filesystem::file_status s = status( p );
+
+         if( boost::filesystem::exists( s ) ) {
+            return true;
+         }
+
+         return false;
+      }
+
    } // end of ns err
 
 
@@ -84,14 +131,14 @@ namespace rlf_txtrw {
 
       void operator()( const std::string& filename, std::list<std::string> & lines )  {
 
-         if( !file_exists( filename ) ) {
+         if( !err::file_exists_r( filename ) ) {
             std::string s = err::file_not_exists( filename );
             throw bad_text_read( s );
          }
 
          std::ifstream fp( filename.c_str() );
 
-         if( fp.bad() ) {
+         if( !fp.is_open() ) {
             std::string s = err::read_file( filename );
             throw bad_text_read( s );
          }
@@ -112,19 +159,19 @@ namespace rlf_txtrw {
       }
       void operator()( const std::string& filename, std::string& str )  {
 
-         if( !file_exists( filename ) ) {
+         if( !err::file_exists_r( filename ) ) {
             std::string s = err::file_not_exists( filename );
             throw bad_text_read( s );
          }
 
          std::ifstream fp( filename.c_str() );
 
-         if( fp.bad() ) {
+         if( !fp.is_open() ) {
             std::string s = err::read_file( filename );
             throw bad_text_read( s );
          }
 
-         while( !fp.eof() ) {
+         while( fp.good() ) {
             std::string temp;
             getline( fp, temp );
 

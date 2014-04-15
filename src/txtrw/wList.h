@@ -38,30 +38,81 @@
 #include <boost/filesystem.hpp>
 #include <boost/cstdint.hpp>
 
-#include "helper.h"
 
-using namespace helper_read_write_file;
+
+//#include "helper.h"
+
+//using namespace helper_read_write_file;
 
 namespace rlf_txtrw {
 
+
+
+   namespace whelper {
+      const std::string marker = "%s";
+
+      inline std::string FindAndReplace( const std::string& source,
+                                         const std::string& find,
+                                         const std::string& replace ) {
+         size_t i;
+         size_t start = 0;
+         std::string ret = source;
+
+         for( ; ( i = ret.find( find, start ) ) != std::string::npos; ) {
+            ret.replace( i, find.length(), replace );
+            start = i + replace.length();
+         }
+
+         return ret;
+      }
+
+      inline std::string replace( std::string const& msg, std::string const& s0 = "" ) {
+
+         if( s0.size() > 0 ) {
+            return FindAndReplace( msg, whelper::marker, s0 );
+         }
+
+         return msg;
+
+      }
+
+
+
+
+   }
+
+
    namespace err {
 
-      const std::string msg_file_exists = "File exists: '" + marker + "'";
-      const std::string msg_write_file = "Couldn't write file: '" + marker + "'";
-      const std::string msg_open_file = "Couldn't open file for write: '" + marker + "'";
-      const std::string msg_text_empty = "Text has no lines: '" + marker + "'";
+      const std::string msg_file_exists = "File exists: '" + whelper::marker + "'";
+      const std::string msg_write_file = "Couldn't write file: '" + whelper::marker + "'";
+      const std::string msg_open_file = "Couldn't open file for write: '" + whelper::marker + "'";
+      const std::string msg_text_empty = "Text has no lines: '" + whelper::marker + "'";
 
       inline std::string write_file( std::string const& s0 ) {
-         return replace( msg_write_file, s0 );
+         return whelper::replace( msg_write_file, s0 );
       }
       inline std::string file_exists( std::string const& s0 ) {
-         return replace( msg_file_exists, s0 );
+         return whelper::replace( msg_file_exists, s0 );
       }
       inline std::string file_open( std::string const& s0 ) {
-         return replace( msg_open_file, s0 );
+         return whelper::replace( msg_open_file, s0 );
       }
       inline std::string text_empty( std::string const& s0 ) {
-         return replace( msg_text_empty, s0 );
+         return whelper::replace( msg_text_empty, s0 );
+      }
+      inline bool file_exists_( boost::filesystem::path const& p ) {
+         if( !boost::filesystem::is_regular_file( p ) ) {
+            return false;
+         }
+
+         boost::filesystem::file_status s = status( p );
+
+         if( boost::filesystem::exists( s ) ) {
+            return true;
+         }
+
+         return false;
       }
 
    }
@@ -90,20 +141,22 @@ namespace rlf_txtrw {
    public:
       t_write_ascii() {}
       ~t_write_ascii() {}
-      void operator()( const std::string& file, std::list<std::string> const& lines ) {
+      void operator()( const std::string& file, std::list<std::string> const& lines, bool overwrite = false ) {
 
-         if( file_exists( file ) ) {
-            throw bad_text_write( err::file_exists( file ) );
+         if( ! overwrite ) {
+            if( err::file_exists_( file ) ) {
+               throw bad_text_write( err::file_exists( file ) );
+            }
          }
 
-         if( lines.size() == 0 ) {
-            throw bad_text_write( err::text_empty( file ) );
-         }
+         //         if( lines.size() == 0 ) {
+         //            throw bad_text_write( err::text_empty( file ) );
+         //         }
 
          if( lines.size() > 0 ) {
             std::ofstream fp( file.c_str() );
 
-            if( fp.bad() ) {
+            if( !fp.is_open() ) {
                throw bad_text_write( err::file_open( file ) );
             }
 
@@ -114,10 +167,12 @@ namespace rlf_txtrw {
             }
          }
       }
-      void operator()( const std::string& file, std::string const& str ) {
+      void operator()( const std::string& file, std::string const& str, bool overwrite = false ) {
 
-         if( file_exists( file ) ) {
-            throw bad_text_write( err::file_exists( file ) );
+         if( ! overwrite ) {
+            if( err::file_exists_( file ) ) {
+               throw bad_text_write( err::file_exists( file ) );
+            }
          }
 
          if( str.size() == 0 ) {
@@ -127,7 +182,7 @@ namespace rlf_txtrw {
          if( str.size() > 0 ) {
             std::ofstream fp( file.c_str() );
 
-            if( fp.bad() ) {
+            if( !fp.is_open() ) {
                throw bad_text_write( err::file_open( file ) );
             }
 

@@ -8,7 +8,7 @@
 #include "filetreewalk.h"
 #include "stringhelper.h"
 #include "t_filename.h"
-#include "t_fncontrol.h"
+#include "fn_control.h"
 
 using namespace std;
 using namespace rlf_ftw;
@@ -39,16 +39,41 @@ void foldererase_generate_commandline( std::pair<string, string> const& p ) {
    cout << temp  << endl;
 }
 
-
-int main() {
-
-   vector<char> test;
+vector<int8_t>  test_assign_c_array(){
+   vector<int8_t> test;
    char const* CArray = "abcdeef";
    test.assign( CArray, CArray + sizeof( CArray ) );
    test.assign( CArray, CArray + strlen( CArray ) );
-
+   return test;
+}
+vector<int8_t>  test_assign_string(){
    string CppArray = "Cppabcdeef";
+   vector<int8_t> test;
    test.assign( CppArray.begin(), CppArray.end() );
+   return test;
+}
+
+
+struct C {
+  C() {}
+  C(const C&) {
+     std::cout << "A copy was made.\n";
+  }
+};
+
+C f() {
+  return C();
+}
+
+
+
+int main() {
+   std::cout << "Hello World!\n";
+   C obj = f();
+
+   vector<int8_t> test = test_assign_c_array();
+
+   test = test_assign_string();
 
    list<char> testList( test.begin(), test.end() );
 
@@ -56,23 +81,30 @@ int main() {
 
    sort( test.begin(), test.end() );
 
-   string alleFolder = "/home/richard/wrk/snippets2";
-   rlf_hfile::tFnFunctions t;
+   string alleFolder = "./src/";
 
-   rlf_ftw::ftw ftw( alleFolder );
-   string pattern = ".svn; *";
 
-   std::vector<rlf_filefn::t_filename> list = t.files_in_subfolders( alleFolder, "*", pattern );
-   std::vector<rlf_filefn::t_filename> list1 = t.files_in_folder( alleFolder, "*", pattern );
-   std::vector<rlf_filefn::t_filename> folders = t.subfolders( alleFolder );
+  // rlf_ftw::ftw ftw( alleFolder );
+   string pattern = ".cpp";
 
+   rlf_hfile::fn_control::tInclude include = pattern;
+   rlf_hfile::fn_control::tExclude exclude;
+   std::vector<rlf_filefn::t_filename> files = rlf_hfile::fn_control::files_in_subfolders( alleFolder, include, exclude );
+   std::vector<rlf_filefn::t_filename> folderfiles = rlf_hfile::fn_control::files_in_folder( alleFolder, include, exclude );
+   std::vector<rlf_filefn::t_filename> folders = rlf_hfile::fn_control::subfolders( alleFolder );
+
+   int c = rlf_hfile::fn_control::get_folder_count(alleFolder);
 
    cout << endl;
+   string e = " end ";
+   for_each( files.begin(), files.end(),
+                [&e]( rlf_filefn::t_filename const& s ){
+									cout << s.fullname() << e << endl; 
+									}
+							);
 
-   //   for_each( list.begin(), list.end(),
-   //             []( rlf_filefn::t_filename const& s ){ cout << s.fullname() << endl; });
-for( const rlf_filefn::t_filename & fn: list ) {
-      //cout << fn.fullname() << endl;
+   for( auto& fn: files ) {
+      sout(fn);
    }
 
    //   for_each( list.begin(), list.end(), sout );
@@ -81,19 +113,17 @@ for( const rlf_filefn::t_filename & fn: list ) {
    cout << endl;
 
 
-   random_shuffle( list.begin(), list.end() );
+   random_shuffle( files.begin(), files.end() );
 
-   for_each( list.begin(), list.end(), sout );
+   for_each( files.begin(), files.end(), sout );
    cout << endl;
    cout << endl;
    cout << endl;
 
    map<string, rlf_filefn::t_filename> fnsorted;
 
-   std::vector<rlf_filefn::t_filename>::const_iterator fnStart = list.begin();
-   std::vector<rlf_filefn::t_filename>::const_iterator fnEnd = list.end();
 
-for( const rlf_filefn::t_filename & fn: list ) {
+   for( const rlf_filefn::t_filename & fn: files ) {
       string temp = fn.base();
       fnsorted[temp] =  fn;
    }

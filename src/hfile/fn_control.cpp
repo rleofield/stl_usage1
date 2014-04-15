@@ -24,36 +24,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "stringhelper.h"
 #include "filehelper.h"
 #include "filetreewalk.h"
-#include "t_fncontrol.h"
+#include "fn_control.h"
+#include "timer.h"
 
 
-
-using namespace std;
+using std::string;
 using rlf_hstring::index;
+using rlf_filefn::t_filename;
+using rlf_hfile_intern::tSaveCurrentDirectory ;
+
 
 namespace rlf_hfile {
 
+namespace fn_control {
 
-
-
-   bool tFnFunctions::create_folder( std::string const& path )const {
+   bool create_folder( std::string const& path ) {
       bool temp = rlf_hfile_intern::create_directory( path );
       return temp;
    }
-   bool tFnFunctions::create_folders( std::string const& path )const {
-      rlf_hfile_intern::tSaveCurrentDirectory save;
+   bool create_folders( std::string const& path ) {
+      tSaveCurrentDirectory save;
       bool temp = rlf_hfile_intern::create_directory_recursive( path );
       return temp;
    }
 
-   string tFnFunctions::working_folder()const {
+   string working_folder() {
       string temp = rlf_hfile_intern::working_directory();
       temp = rlf_hfile_intern::correct_slash_at_end( temp );
       return temp;
    }
 
-   bool tFnFunctions::change_folder( string const& newPath )const {
-      // rlf_hfile_intern::tSaveCurrentDirectory save;
+   bool change_folder( string const& newPath ) {
       return rlf_hfile_intern::change_directory( newPath );
    }
 
@@ -65,7 +66,6 @@ namespace rlf_hfile {
 
 
 
-
    namespace {
       bool compareByFullname( t_filename const& i, t_filename const& j ) {
          return ( i.fullname() < j.fullname() );
@@ -73,10 +73,13 @@ namespace rlf_hfile {
    }
 
    // get files in subfolder non recursive
-   std::vector<rlf_filefn::t_filename> tFnFunctions::files_in_subfolders( std::string const& path, string const& include, string const& exclude ) const {
+   std::vector<t_filename> files_in_subfolders(
+         std::string const& path,
+         tInclude const& include,
+         tExclude const& exclude )   {
 
-      string temp_include = include;
-      string temp_exclude = exclude;
+      string temp_include = include.val;
+      string temp_exclude = exclude.val;
 
 
       rlf_ftw::ftw f( path );
@@ -86,23 +89,36 @@ namespace rlf_hfile {
       return f.files();
    }
 
-   std::vector<rlf_filefn::t_filename> tFnFunctions::subfolders( std::string const& path, string const& include, string const& exclude ) const {
+   std::vector<t_filename> subfolders(
+         std::string const& path,
+         tInclude const& include,
+         tExclude const& exclude )
+    {
       if( !path_exists( path ) ) {
-         return std::vector<rlf_filefn::t_filename>();
+         return std::vector<t_filename>();
       }
 
       rlf_ftw::ftw f( path );
-      f.include_folders( include );
-      f.exclude_folders( exclude );
+      f.include_folders( include.val );
+      f.exclude_folders( exclude.val );
       f.scan_folders();
       return f.dirs();
    }
 
 
 
-   std::vector<rlf_filefn::t_filename> tFnFunctions::files_in_folder( std::string const& path, string const& include, string const& exclude )const {
-      string temp_include = include;
-      string temp_exclude = exclude;
+   std::vector<t_filename> files_in_folder(
+         std::string const& path,
+         tInclude const& include,
+         tExclude const& exclude )
+    {
+      
+      if( !path_exists( path ) ) {
+         return std::vector<t_filename>();
+      }
+      
+      string temp_include = include.val;
+      string temp_exclude = exclude.val;
 
 
       rlf_ftw::ftw f( path );
@@ -114,72 +130,59 @@ namespace rlf_hfile {
    }
 
 
-
-   // wenn: an 2. Stelle am Anfang steht dann nicht ok
-   bool tFnFunctions::isAbsolutePath( string const& path )const {
-      size_t pos = index( path, ":" );
-
-      if( pos == 1 ) {
-         return true;
-      }
-
-      return false;
-   }
-
-
-   std::string tFnFunctions::correct_slash_at_end( std::string const& path ) {
+   std::string correct_slash_at_end( std::string const& path ) {
       return rlf_hfile_intern::correct_slash_at_end( path );
    }
 
-   std::string tFnFunctions::basename( std::string const& file )const {
+   std::string basename( std::string const& file ) {
       return rlf_hfile_intern::getbasename( file );
    }
 
-   std::string tFnFunctions::extension( std::string const& file ) const {
+   std::string extension( std::string const& file ) {
       return rlf_hfile_intern::getextension( file );
    }
 
 
-   bool tFnFunctions::file_exists( string const& fn )const {
+   bool file_exists( string const& fn ) {
       return rlf_hfile_intern::file_exists( fn );
    }
 
-   bool tFnFunctions::path_exists( string const& path )const {
+   bool path_exists( string const& path ) {
       return rlf_hfile_intern::path_exists( path );
    }
 
-   boost::uintmax_t tFnFunctions::file_size( std::string const& file )const {
+   boost::uintmax_t file_size( std::string const& file ) {
       return rlf_hfile_intern::file_size( file );
    }
 
 
-   string tFnFunctions::int_to_string( int val, size_t width )const {
+   string int_to_string( int val, size_t width ) {
       string s = rlf_hstring::toString( val, width, ' ' );
       return s;
    }
-   string tFnFunctions::uint_to_string( uint32_t val, size_t  width, char fill )const {
+   string uint_to_string( uint32_t val, size_t  width, char fill ) {
       string s = rlf_hstring::toString( val, width, fill );
       return s;
    }
 
-
-   uint32_t tFnFunctions::get_folder_count( string const& path )const
-
-   try {
-      std::vector<rlf_filefn::t_filename> v = subfolders( path );
-      return static_cast<uint32_t>( v.size() );
-   } catch( rlf_ftw::bad_ftw& ex ) {
-      return 0;
-   }
-
-   string tFnFunctions::date_time( string const& format )const {
-      return rlf_time::now( format );
+   uint32_t get_folder_count( string const& path ){
+      try {
+         std::vector<t_filename> v = subfolders( path );
+         return static_cast<uint32_t>( v.size() );
+      } catch( rlf_ftw::bad_ftw& ex ) {
+         return 0;
+      }
    }
 
 
+   string date_time( string const& format ) {
+      return rlf_htime::tTimer::now( format );
+   }
+
+} // end of ns fn_control
 
 
-} // end of namespace
+} // end of ns rlf_hfile
 
 
 //EOF

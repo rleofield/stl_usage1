@@ -212,23 +212,15 @@ namespace rlf_hfile_intern {
       return local::current_path_( in );
    }
 
-
-
-
    bool  create_directory_recursive( string const& in ) {
-
       string pwd = working_directory();
-
       if( pwd == in ) { // nothing to do
          return true;
       }
-
-      boost::filesystem::path p( in );
-
       if( path_exists( in ) ) {
          return true;
       }
-
+      boost::filesystem::path p( in );
       boost::filesystem::create_directories( p );
       return false;
    }

@@ -7,23 +7,26 @@ CONFIG -= qt
 SOURCES += \
     src/main.cpp \
     src/filefn/t_filename.cpp \
-    src/ftw/filetreewalk.cpp \
-    src/hfile/t_ifncontrol.cpp \
     src/hfile/filehelper.cpp \
     src/hstring/stringhelper.cpp \
     src/hstring/gettokens.cpp \
-    src/hfile/time.cpp
+    src/htime/timer.cpp \
+    src/hfile/fn_control.cpp \
+    src/filefn/filetreewalk.cpp
 
 HEADERS += \
     src/filefn/t_filename.h \
     src/filefn/boost_cstdint.h \
     src/ftw/filetreewalk.h \
-    src/hfile/t_fncontrol.h \
     src/hfile/filehelper.h \
     src/hstring/stringhelper.h \
     src/hstring/gettokens.h \
     src/txtrw/wList.h \
-    src/txtrw/rList.h
+    src/txtrw/rList.h \
+    src/boost/boost_cstdint.h \
+    src/htime/timer.h \
+    src/hfile/fn_control.h \
+    src/filefn/filetreewalk.h
 
 
 #DESTDIR += bin
@@ -65,6 +68,8 @@ INCLUDEPATH += $$PWD/src/hstring
 INCLUDEPATH += $$PWD/src/hfile
 INCLUDEPATH += $$PWD/src/filefn
 INCLUDEPATH += $$PWD/src/ftw
+INCLUDEPATH += $$PWD/src/boost
+INCLUDEPATH += $$PWD/src/htime
 
 
 

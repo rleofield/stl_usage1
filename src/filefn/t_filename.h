@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <vector>
 
-#include "boost_cstdint.h"
+//#include "boost_cstdint.h"
 #include "boost/filesystem/path.hpp"
 
 
@@ -60,7 +60,7 @@ namespace rlf_filefn {
    class fnimpl;
    class t_filename {
 
-      friend class fnimpl;
+      //friend class fnimpl;
 
       fnimpl* impl;
 

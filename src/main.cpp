@@ -12,6 +12,8 @@
 
 using namespace std;
 using namespace rlf_ftw;
+using rlf_filefn::t_filename;
+using namespace rlf_hfile::fn_control;
 
 void sout( rlf_filefn::t_filename const& s ) {
    // hier kann man mit jedem File etwas machen
@@ -55,21 +57,21 @@ vector<int8_t>  test_assign_string(){
 
 
 struct C {
-  C() {}
-  C(const C&) {
-     std::cout << "A copy was made.\n";
-  }
+      C() {}
+      C(const C&) {
+         std::cout << "A copy was made.\n";
+      }
 };
 
 C f() {
-  return C();
+   return C();
 }
 
 
 
 int main() {
    std::cout << "Hello World!\n";
-   C obj = f();
+   //C obj = f();
 
    vector<int8_t> test = test_assign_c_array();
 
@@ -81,27 +83,27 @@ int main() {
 
    sort( test.begin(), test.end() );
 
-   string alleFolder = "./src/";
+   string alleFolder = "../src/";
 
 
-  // rlf_ftw::ftw ftw( alleFolder );
+   // rlf_ftw::ftw ftw( alleFolder );
    string pattern = ".cpp";
 
-   rlf_hfile::fn_control::tInclude include = pattern;
-   rlf_hfile::fn_control::tExclude exclude;
-   std::vector<rlf_filefn::t_filename> files = rlf_hfile::fn_control::files_in_subfolders( alleFolder, include, exclude );
-   std::vector<rlf_filefn::t_filename> folderfiles = rlf_hfile::fn_control::files_in_folder( alleFolder, include, exclude );
-   std::vector<rlf_filefn::t_filename> folders = rlf_hfile::fn_control::subfolders( alleFolder );
+   tInclude include = pattern;
+   tExclude exclude;
+   std::vector<t_filename> files = rlf_hfile::fn_control::files_in_subfolders( alleFolder, include, exclude );
+   std::vector<t_filename> folderfiles = rlf_hfile::fn_control::files_in_folder( alleFolder, include, exclude );
+   std::vector<t_filename> folders = rlf_hfile::fn_control::subfolders( alleFolder );
 
    int c = rlf_hfile::fn_control::get_folder_count(alleFolder);
 
    cout << endl;
    string e = " end ";
    for_each( files.begin(), files.end(),
-                [&e]( rlf_filefn::t_filename const& s ){
-									cout << s.fullname() << e << endl; 
-									}
-							);
+             [&e]( rlf_filefn::t_filename const& s ){
+      cout << s.fullname() << e << endl;
+   }
+   );
 
    for( auto& fn: files ) {
       sout(fn);

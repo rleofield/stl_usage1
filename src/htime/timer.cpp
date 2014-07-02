@@ -32,6 +32,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "timer.h"
 
+
+#ifdef _WIN32
+#pragma warning( disable:4996 4100 4101) // _CRT_SECURE_NO_WARNINGS
+#endif
+
 using namespace std;
 
 namespace rlf_htime {

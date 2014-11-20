@@ -23,7 +23,6 @@ HEADERS += \
     src/hstring/gettokens.h \
     src/txtrw/wList.h \
     src/txtrw/rList.h \
-    src/boost/boost_cstdint.h \
     src/htime/timer.h \
     src/hfile/fn_control.h \
     src/filefn/filetreewalk.h

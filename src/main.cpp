@@ -14,6 +14,9 @@ using namespace std;
 using namespace rlf_ftw;
 using rlf_filefn::t_filename;
 using namespace rlf_hfile::fn_control;
+using rlf_ftw::tExcludeFolders;
+using rlf_ftw::tIncludeFiles;
+
 
 void sout( rlf_filefn::t_filename const& s ) {
    // hier kann man mit jedem File etwas machen
@@ -83,19 +86,29 @@ int main() {
 
    sort( test.begin(), test.end() );
 
-   string alleFolder = "../src/";
+   string base = "./src/";
 
 
    // rlf_ftw::ftw ftw( alleFolder );
    string pattern = ".cpp";
 
-   tInclude include = pattern;
-   tExclude exclude;
-   std::vector<t_filename> files = rlf_hfile::fn_control::files_in_subfolders( alleFolder, include, exclude );
-   std::vector<t_filename> folderfiles = rlf_hfile::fn_control::files_in_folder( alleFolder, include, exclude );
-   std::vector<t_filename> folders = rlf_hfile::fn_control::subfolders( alleFolder );
+   rlf_ftw::ftw ftw;
 
-   int c = rlf_hfile::fn_control::get_folder_count(alleFolder);
+   tExcludeFolders ExcludeFolder;
+   ExcludeFolder.contains = ".svn, .tmp, Debug, Release, html";
+   tIncludeFiles inc;
+   inc.last = ".cpp, .h";
+   ftw.path( base );
+   ftw.set_exclude_folders( ExcludeFolder );
+   ftw.set_include_files( inc );
+   ftw.scan_folders();
+   //rlf_ftw::ftwReturn ret = ftw.ret;
+
+   std::vector<t_filename> files = ftw.files(); //rlf_hfile::fn_control::files_in_subfolders( alleFolder, include, exclude );
+   //std::vector<t_filename> folderfiles = rlf_hfile::fn_control::files_in_folder( alleFolder, include, exclude );
+   std::vector<t_filename> folders = ftw.folders();// rlf_hfile::fn_control::subfolders( alleFolder );
+
+   size_t c = folders.size(); //rlf_hfile::fn_control::get_folder_count(alleFolder);
 
    cout << endl;
    string e = " end ";

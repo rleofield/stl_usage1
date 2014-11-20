@@ -23,14 +23,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "stringhelper.h"
 #include "filehelper.h"
-#include "filetreewalk.h"
+//#include "filetreewalk.h"
 #include "fn_control.h"
 #include "timer.h"
 
-
-#ifdef _WIN32
-#pragma warning( disable:4996 4100 4101) // _CRT_SECURE_NO_WARNINGS
-#endif
 
 
 using std::string;
@@ -41,150 +37,95 @@ using rlf_hfile_intern::tSaveCurrentDirectory ;
 
 namespace rlf_hfile {
 
-namespace fn_control {
+   namespace fn_control {
 
-   bool create_folder( std::string const& path ) {
-      bool temp = rlf_hfile_intern::create_directory( path );
-      return temp;
-   }
-   bool create_folders( std::string const& path ) {
-      tSaveCurrentDirectory save;
-      bool temp = rlf_hfile_intern::create_directory_recursive( path );
-      return temp;
-   }
-
-   string working_folder() {
-      string temp = rlf_hfile_intern::working_directory();
-      temp = rlf_hfile_intern::correct_slash_at_end( temp );
-      return temp;
-   }
-
-   bool change_folder( string const& newPath ) {
-      return rlf_hfile_intern::change_directory( newPath );
-   }
-
-   namespace {
-      bool compareByString( string const& i, string const& j ) {
-         return ( i < j );
+      bool create_folder( std::string const& path ) {
+         bool temp = rlf_hfile_intern::create_directory( path );
+         return temp;
       }
-   }
-
-
-
-   namespace {
-      bool compareByFullname( t_filename const& i, t_filename const& j ) {
-         return ( i.fullname() < j.fullname() );
-      }
-   }
-
-   // get files in subfolder non recursive
-   std::vector<t_filename> files_in_subfolders(
-         std::string const& path,
-         tInclude const& include,
-         tExclude const& exclude )   {
-
-      string temp_include = include.val;
-      string temp_exclude = exclude.val;
-
-
-      rlf_ftw::ftw f( path );
-      f.include_files( temp_include );
-      f.exclude_files( temp_exclude );
-      f.scan_folders();
-      return f.files();
-   }
-
-   std::vector<t_filename> subfolders(
-         std::string const& path,
-         tInclude const& include,
-         tExclude const& exclude )
-    {
-      if( !path_exists( path ) ) {
-         return std::vector<t_filename>();
+      bool create_folders( std::string const& path ) {
+         tSaveCurrentDirectory save;
+         bool temp = rlf_hfile_intern::create_directory_recursive( path );
+         return temp;
       }
 
-      rlf_ftw::ftw f( path );
-      f.include_folders( include.val );
-      f.exclude_folders( exclude.val );
-      f.scan_folders();
-      return f.dirs();
-   }
-
-
-
-   std::vector<t_filename> files_in_folder(
-         std::string const& path,
-         tInclude const& include,
-         tExclude const& exclude )
-    {
-      
-      if( !path_exists( path ) ) {
-         return std::vector<t_filename>();
+      string working_folder() {
+         string temp = rlf_hfile_intern::working_directory();
+         temp = rlf_hfile_intern::correct_slash_at_end( temp );
+         return temp;
       }
-      
-      string temp_include = include.val;
-      string temp_exclude = exclude.val;
 
-
-      rlf_ftw::ftw f( path );
-      f.include_files( temp_include );
-      f.exclude_files( temp_exclude );
-      f.scan_folder();
-      return f.files();
-
-   }
-
-
-   std::string correct_slash_at_end( std::string const& path ) {
-      return rlf_hfile_intern::correct_slash_at_end( path );
-   }
-
-   std::string basename( std::string const& file ) {
-      return rlf_hfile_intern::getbasename( file );
-   }
-
-   std::string extension( std::string const& file ) {
-      return rlf_hfile_intern::getextension( file );
-   }
-
-
-   bool file_exists( string const& fn ) {
-      return rlf_hfile_intern::file_exists( fn );
-   }
-
-   bool path_exists( string const& path ) {
-      return rlf_hfile_intern::path_exists( path );
-   }
-
-   boost::uintmax_t file_size( std::string const& file ) {
-      return rlf_hfile_intern::file_size( file );
-   }
-
-
-   string int_to_string( int val, size_t width ) {
-      string s = rlf_hstring::toString( val, width, ' ' );
-      return s;
-   }
-   string uint_to_string( uint32_t val, size_t  width, char fill ) {
-      string s = rlf_hstring::toString( val, width, fill );
-      return s;
-   }
-
-   uint32_t get_folder_count( string const& path ){
-      try {
-         std::vector<t_filename> v = subfolders( path );
-         return static_cast<uint32_t>( v.size() );
-      } catch( rlf_ftw::bad_ftw& ex ) {
-         return 0;
+      bool change_folder( string const& newPath ) {
+         return rlf_hfile_intern::change_directory( newPath );
       }
-   }
+
+      namespace {
+         bool compareByString( string const& i, string const& j ) {
+            return ( i < j );
+         }
+      }
 
 
-   string date_time( string const& format ) {
-      return rlf_htime::tTimer::now( format );
-   }
 
-} // end of ns fn_control
+      namespace {
+         bool compareByFullname( t_filename const& i, t_filename const& j ) {
+            return ( i.fullname() < j.fullname() );
+         }
+      }
+
+      std::string correct_slash_at_end( std::string const& path ) {
+         return rlf_hfile_intern::correct_slash_at_end( path );
+      }
+
+      std::string basename( std::string const& file ) {
+         return rlf_hfile_intern::getbasename( file );
+      }
+
+      std::string extension( std::string const& file ) {
+         return rlf_hfile_intern::getextension( file );
+      }
+
+
+      bool file_exists( string const& fn ) {
+         return rlf_hfile_intern::file_exists( fn );
+      }
+
+      bool path_exists( string const& path ) {
+         return rlf_hfile_intern::path_exists( path );
+      }
+
+      boost::uintmax_t file_size( std::string const& file ) {
+         return rlf_hfile_intern::file_size( file );
+      }
+
+
+      string int_to_string( int val, size_t width ) {
+         size_t prec = 2;
+         string s = rlf_hstring::toString( val, width, prec );
+         return s;
+      }
+      string uint_to_string( uint32_t val, size_t  width, char fill ) {
+         size_t prec = 2;
+         string s = rlf_hstring::toString( val, width, prec, fill );
+         return s;
+      }
+
+//      uint32_t get_folder_count( string const& path ) {
+//         try {
+//            ftwReturn ret = subfolders( path );
+//            std::vector<t_filename> v = ret.folders();
+//            return static_cast<uint32_t>( v.size() );
+//         } catch( rlf_ftw::bad_ftw& ex ) {
+//            return 0;
+//         }
+//      }
+
+
+      string date_time( string const& format ) {
+         return rlf_htime::tTimer::now( format );
+      }
+
+   } // end of ns fn_control
 
 
 } // end of ns rlf_hfile

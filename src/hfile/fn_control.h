@@ -37,10 +37,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "filehelper.h"
 #include "t_filename.h"
 
-#include "filetreewalk.h"
+//#include "filetreewalk.h"
 
 using std::string;
-using namespace rlf_ftw;
 
 namespace rlf_hfile {
 
@@ -56,19 +55,6 @@ namespace rlf_hfile {
 
 
 
-      class tIncludeExclude {
-         void operator=( tIncludeExclude const& );
-      public:
-         string include_files;
-         string exclude_files;
-         string include_folders;
-         string exclude_folders;
-         tIncludeExclude(): include_files(), exclude_files(), include_folders(), exclude_folders() {}
-
-         tIncludeExclude( tIncludeExclude const& i ): include_files( i.include_files ), exclude_files( i.exclude_files ),
-            include_folders( i.include_folders ), exclude_folders( i.exclude_folders ) {}
-
-      };
 
 
 
@@ -82,20 +68,6 @@ namespace rlf_hfile {
 
       bool delete_recursive( std::string const& path );
 
-      std::vector<rlf_filefn::t_filename> files_in_folder(
-         string const& path,
-         tInclude const& include = tInclude(),
-         tExclude const& exclude = tExclude()
-      ) ;
-      std::vector<rlf_filefn::t_filename> files_in_subfolders(
-         string const& path,
-         tInclude const& include = tInclude(),
-         tExclude const& exclude = tExclude() );
-
-      std::vector<rlf_filefn::t_filename> subfolders(
-         string const& path,
-         tInclude const& include = tInclude(),
-         tExclude const& exclude = tExclude() );
 
       bool isAbsolutePath( string const& path );
 
@@ -116,7 +88,7 @@ namespace rlf_hfile {
       // uint to string, default fillchar is '0'
       string uint_to_string( uint32_t val, size_t  width = 3, char fill = '0' );
 
-      uint32_t get_folder_count( string const& path );
+      //uint32_t get_folder_count( string const& path );
 
       string date_time( string const& format = rlf_time::date_time_hyphenated ); // as 2012-07-25_17-35-10
 

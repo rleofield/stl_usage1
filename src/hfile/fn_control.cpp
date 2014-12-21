@@ -28,6 +28,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "timer.h"
 
 
+#ifdef _WIN32
+#pragma warning( disable:4996 4100 4101) // _CRT_SECURE_NO_WARNINGS
+#endif
+
 
 using std::string;
 using rlf_hstring::index;
@@ -110,15 +114,15 @@ namespace rlf_hfile {
          return s;
       }
 
-//      uint32_t get_folder_count( string const& path ) {
-//         try {
-//            ftwReturn ret = subfolders( path );
-//            std::vector<t_filename> v = ret.folders();
-//            return static_cast<uint32_t>( v.size() );
-//         } catch( rlf_ftw::bad_ftw& ex ) {
-//            return 0;
-//         }
-//      }
+      //      uint32_t get_folder_count( string const& path ) {
+      //         try {
+      //            ftwReturn ret = subfolders( path );
+      //            std::vector<t_filename> v = ret.folders();
+      //            return static_cast<uint32_t>( v.size() );
+      //         } catch( rlf_ftw::bad_ftw& ex ) {
+      //            return 0;
+      //         }
+      //      }
 
 
       string date_time( string const& format ) {

@@ -44,14 +44,14 @@ void foldererase_generate_commandline( std::pair<string, string> const& p ) {
    cout << temp  << endl;
 }
 
-vector<int8_t>  test_assign_c_array(){
+vector<int8_t>  test_assign_c_array() {
    vector<int8_t> test;
    char const* CArray = "abcdeef";
    test.assign( CArray, CArray + sizeof( CArray ) );
    test.assign( CArray, CArray + strlen( CArray ) );
    return test;
 }
-vector<int8_t>  test_assign_string(){
+vector<int8_t>  test_assign_string() {
    string CppArray = "Cppabcdeef";
    vector<int8_t> test;
    test.assign( CppArray.begin(), CppArray.end() );
@@ -60,10 +60,10 @@ vector<int8_t>  test_assign_string(){
 
 
 struct C {
-      C() {}
-      C(const C&) {
-         std::cout << "A copy was made.\n";
-      }
+   C() {}
+   C( const C& ) {
+      std::cout << "A copy was made.\n";
+   }
 };
 
 C f() {
@@ -113,13 +113,13 @@ int main() {
    cout << endl;
    string e = " end ";
    for_each( files.begin(), files.end(),
-             [&e]( rlf_filefn::t_filename const& s ){
+   [&e]( rlf_filefn::t_filename const & s ) {
       cout << s.fullname() << e << endl;
    }
-   );
+           );
 
-   for( auto& fn: files ) {
-      sout(fn);
+   for( auto & fn : files ) {
+      sout( fn );
    }
 
    //   for_each( list.begin(), list.end(), sout );
@@ -138,7 +138,7 @@ int main() {
    map<string, rlf_filefn::t_filename> fnsorted;
 
 
-   for( const rlf_filefn::t_filename & fn: files ) {
+   for( const rlf_filefn::t_filename & fn : files ) {
       string temp = fn.base();
       fnsorted[temp] =  fn;
    }

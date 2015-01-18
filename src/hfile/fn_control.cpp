@@ -28,9 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "timer.h"
 
 
-#ifdef _WIN32
-#pragma warning( disable:4996 4100 4101) // _CRT_SECURE_NO_WARNINGS
-#endif
 
 
 using std::string;
@@ -103,13 +100,13 @@ namespace rlf_hfile {
       }
 
 
-      string int_to_string( int val, size_t width ) {
-         size_t prec = 2;
+      string int_to_string( int val, int width ) {
+         int prec = 2;
          string s = rlf_hstring::toString( val, width, prec );
          return s;
       }
-      string uint_to_string( uint32_t val, size_t  width, char fill ) {
-         size_t prec = 2;
+      string uint_to_string( uint32_t val, int  width, char fill ) {
+         int prec = 2;
          string s = rlf_hstring::toString( val, width, prec, fill );
          return s;
       }

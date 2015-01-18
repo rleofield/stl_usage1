@@ -83,10 +83,10 @@ namespace rlf_hfile {
 
       // int to string, fill char is ' '
       // an other fillchar is ugly for negative values
-      string int_to_string( int val, size_t width = 3 );
+      string int_to_string( int val, int width = 3 );
 
       // uint to string, default fillchar is '0'
-      string uint_to_string( uint32_t val, size_t  width = 3, char fill = '0' );
+      string uint_to_string( uint32_t val, int  width = 3, char fill = '0' );
 
       //uint32_t get_folder_count( string const& path );
 
